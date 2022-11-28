@@ -1,0 +1,29 @@
+# Ignore build artifacts from the local tests sub-crate.
+**/target/
+/artifacts/
+
+# Ignore backup files creates by cargo fmt.
+**/*.rs.bk
+
+# Remove Cargo.lock when creating an executable, leave it for libraries
+# More information here http://doc.crates.io/guide.html#cargotoml-vs-cargolock
+Cargo.lock
+
+# Dependency directory
+node_modules
+
+package-lock.json
+
+yarn.lock
+
+.vscode
+.idea
+
+node_modules/
+
+.next/
+
+target/
+/types/
+
+.DS_Store

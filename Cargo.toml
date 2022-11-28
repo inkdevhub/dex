@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "uniswap-v2/contracts/**",
+]
+
+exclude = [
+    "uniswap-v2/logics",
+]
