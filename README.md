@@ -18,7 +18,7 @@ This is an unaudited full dex implementation ready to be used.
 ### License
 Apache 2.0
 
-### 🏗️ How to use - Contracts
+## 🏗️ How to use - Contracts
 ##### 💫 Build
 - Use these [instructions](https://use.ink/getting-started/setup) to set up your ink!/Rust environment
 
