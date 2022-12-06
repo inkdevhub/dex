@@ -9,6 +9,7 @@ use openbrush::{
     traits::{
         AccountId,
         Balance,
+        String,
     },
 };
 
@@ -34,10 +35,18 @@ pub fn safe_transfer_from(
 
 #[inline]
 pub fn wrap(wnative: &AccountId, value: Balance) -> Result<(), PSP22Error> {
-    WnativeRef::deposit_builder(wnative)
+    match WnativeRef::deposit_builder(wnative)
         .transferred_value(value)
         .fire()
-        .unwrap()
+    {
+        Ok(res) => {
+            match res {
+                Ok(_) => Ok(()),
+                Err(err) => Err(err),
+            }
+        }
+        Err(_) => Err(PSP22Error::Custom(String::from("deposit failed"))),
+    }
 }
 
 #[inline]

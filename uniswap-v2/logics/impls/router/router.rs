@@ -171,10 +171,18 @@ impl<T: Storage<data::Data>> Router for T {
             liquidity,
         )?;
 
-        let (amount_0, amount_1) = PairRef::burn_builder(&pair_contract, to)
+        let (amount_0, amount_1) = match PairRef::burn_builder(&pair_contract, to)
             .call_flags(CallFlags::default().set_allow_reentry(true))
             .fire()
-            .unwrap()?;
+        {
+            Ok(res) => {
+                match res {
+                    Ok(v) => Ok(v),
+                    Err(err) => Err(RouterError::PairError(err)),
+                }
+            }
+            Err(_) => Err(RouterError::TransferError),
+        }?;
         let (token_0, _) = sort_tokens(token_a, token_b)?;
         let (amount_a, amount_b) = if token_a == token_0 {
             (amount_0, amount_1)
@@ -523,7 +531,7 @@ impl<T: Storage<data::Data>> Internal for T {
             } else {
                 _to
             };
-            PairRef::swap_builder(
+            match PairRef::swap_builder(
                 &pair_for(factory_ref, pair_hash, input, output)?,
                 amount_0_out,
                 amount_1_out,
@@ -531,7 +539,15 @@ impl<T: Storage<data::Data>> Internal for T {
             )
             .call_flags(CallFlags::default().set_allow_reentry(true))
             .fire()
-            .unwrap()?
+            {
+                Ok(res) => {
+                    match res {
+                        Ok(v) => Ok(v),
+                        Err(err) => Err(RouterError::PairError(err)),
+                    }
+                }
+                Err(_) => Err(RouterError::TransferError),
+            }?;
         }
         Ok(())
     }

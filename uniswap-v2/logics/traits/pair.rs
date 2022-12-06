@@ -67,6 +67,7 @@ pub enum PairError {
     OwnableError(OwnableError),
     PausableError(PausableError),
     ReentrancyGuardError(ReentrancyGuardError),
+    TransferError,
     K,
     InsufficientLiquidityMinted,
     InsufficientLiquidityBurned,
