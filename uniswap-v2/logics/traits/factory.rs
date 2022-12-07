@@ -47,6 +47,7 @@ pub enum FactoryError {
     ZeroAddress,
     IdenticalAddresses,
     PairExists,
+    PairInstantiationFailed,
 }
 
 impl From<PairError> for FactoryError {

@@ -38,15 +38,15 @@ pub mod factory {
     impl Factory for FactoryContract {}
 
     impl factory::Internal for FactoryContract {
-        fn _instantiate_pair(&mut self, salt_bytes: &[u8]) -> AccountId {
+        fn _instantiate_pair(&mut self, salt_bytes: &[u8]) -> Result<AccountId, FactoryError> {
             let pair_hash = self.factory.pair_contract_code_hash;
             let pair = PairContractRef::new()
                 .endowment(0)
                 .code_hash(pair_hash)
                 .salt_bytes(&salt_bytes[..4])
                 .instantiate()
-                .unwrap();
-            pair.to_account_id()
+                .map_err(|_| FactoryError::PairInstantiationFailed)?;
+            Ok(pair.to_account_id())
         }
 
         fn _emit_create_pair_event(
