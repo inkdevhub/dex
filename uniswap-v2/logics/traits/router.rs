@@ -178,6 +178,7 @@ pub enum RouterError {
     PairError(PairError),
     HelperError(HelperError),
     TransferHelperError(TransferHelperError),
+    TransferError,
     PairNotFound,
     InsufficientAmount,
     InsufficientAAmount,
