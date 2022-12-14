@@ -20,8 +20,8 @@ Apache 2.0
 
 ## 🏗️ How to use - Contracts
 ##### 💫 Build
-- Use these [instructions](https://use.ink/getting-started/setup) to set up your ink!/Rust environment    
-run this command in the contract folder
+Use these [instructions](https://use.ink/getting-started/setup) to set up your ink!/Rust environment    
+Run this command in the contract folder:
 
 ```sh
 cargo contract build
