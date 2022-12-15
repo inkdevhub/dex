@@ -68,6 +68,15 @@ pub mod pair {
         value: Balance,
     }
 
+    #[ink(event)]
+    pub struct Approval {
+        #[ink(topic)]
+        owner: AccountId,
+        #[ink(topic)]
+        spender: AccountId,
+        value: Balance,
+    }
+
     #[ink(storage)]
     #[derive(Default, SpreadAllocate, Storage)]
     pub struct PairContract {
@@ -154,6 +163,14 @@ pub mod pair {
 
             self._emit_transfer_event(Some(from), Some(to), amount);
             Ok(())
+        }
+
+        fn _emit_approval_event(&self, owner: AccountId, spender: AccountId, amount: Balance) {
+            self.env().emit_event(Approval {
+                owner,
+                spender,
+                value: amount,
+            });
         }
 
         fn _emit_transfer_event(
