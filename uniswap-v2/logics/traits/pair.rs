@@ -3,7 +3,6 @@ use openbrush::{
         reentrancy_guard::*,
         traits::{
             ownable::*,
-            pausable::*,
             psp22::PSP22Error,
         },
     },
@@ -65,7 +64,6 @@ pub trait Pair {
 pub enum PairError {
     PSP22Error(PSP22Error),
     OwnableError(OwnableError),
-    PausableError(PausableError),
     ReentrancyGuardError(ReentrancyGuardError),
     TransferError,
     K,
@@ -119,12 +117,6 @@ pub enum PairError {
 impl From<OwnableError> for PairError {
     fn from(error: OwnableError) -> Self {
         PairError::OwnableError(error)
-    }
-}
-
-impl From<PausableError> for PairError {
-    fn from(access: PausableError) -> Self {
-        PairError::PausableError(access)
     }
 }
 
