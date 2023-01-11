@@ -6,7 +6,10 @@ use crate::helpers::{
     helper::HelperError,
     transfer_helper::TransferHelperError,
 };
-use ink_prelude::vec::Vec;
+use ink::{
+    prelude::vec::Vec,
+    LangError,
+};
 use openbrush::{
     contracts::psp22::PSP22Error,
     traits::{
@@ -178,6 +181,7 @@ pub enum RouterError {
     PairError(PairError),
     HelperError(HelperError),
     TransferHelperError(TransferHelperError),
+    LangError(LangError),
     TransferError,
     PairNotFound,
     InsufficientAmount,
@@ -213,5 +217,6 @@ impl_froms!(
     FactoryError,
     PairError,
     HelperError,
-    TransferHelperError
+    TransferHelperError,
+    LangError
 );

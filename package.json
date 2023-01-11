@@ -3,32 +3,33 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/chai": "^4.3.0",
-    "@types/chai-as-promised": "^7.1.5",
-    "@types/mocha": "^8.0.3",
+    "@727-ventures/typechain-compiler": "0.5.10",
+    "@727-ventures/typechain-types": "0.0.21",
+    "@types/jest": "^29.2.3",
     "@typescript-eslint/eslint-plugin": "^4.8.2",
     "@typescript-eslint/parser": "^4.8.2",
-    "chai": "^4.3.6",
-    "chai-as-promised": "^7.1.1",
     "eslint": "^7.26.0",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^5.1.0",
-    "mocha": "10.1.0",
-    "ts-node": "^10.8.0",
-    "@supercolony/typechain-compiler": "^0.5.1-beta.1",
-    "@supercolony/typechain-types": "^0.0.16",
-    "patch-package": "^6.4.7"
+    "jest": "^29.3.1",
+    "patch-package": "^6.5.1",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.8.0"
   },
   "scripts": {
-    "compile": "typechain-compiler",
-    "compile:release": "typechain-compiler --release",
-    "test:typechain": "mocha --require ts-node/register --recursive ./tests --extension \".spec.ts\" --exit --timeout 20000",
-    "test:single": "mocha --require ts-node/register --extension \".ts\" --exit --timeout 20000",
+    "compile": "typechain-compiler --toolchain nightly-2022-10-10",
+    "compile:release": "typechain-compiler --release --toolchain nightly-2022-10-10",
+    "test:typechain": "jest --testPathPattern \".spec.ts$\" --runInBand",
+    "test:single": "jest",
+    "lint": "prettier --check . && eslint . && cargo check",
+    "lint:fix": "prettier --write . && eslint . --fix && cargo fmt --all",
     "postinstall": "patch-package"
   },
   "resolutions": {
-    "@polkadot/api": "^9.6.1",
-    "@polkadot/api-contract": "^9.6.1"
+    "@polkadot/api": "^9.10.3",
+    "@polkadot/api-contract": "^9.10.3"
   }
 }

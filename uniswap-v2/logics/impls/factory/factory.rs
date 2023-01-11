@@ -4,9 +4,9 @@ pub use crate::{
     impls::factory::*,
     traits::factory::*,
 };
-use ink_env::{
-    hash::Blake2x256,
-    Hash,
+use ink::{
+    env::hash::Blake2x256,
+    primitives::Hash,
 };
 use openbrush::{
     modifier_definition,
