@@ -44,6 +44,12 @@ pub fn sort_tokens(
     Ok((token_0, token_1))
 }
 
+/// Original Uniswap Library pairFor function calculate pair contract address without making cross contract calls.
+/// Please refer https://github.com/Uniswap/v2-periphery/blob/master/contracts/libraries/UniswapV2Library.sol#L18
+///
+/// In this contract, use precomputed address like Uniswap's, as ink!'s deployment is done via create2-like one by default.
+/// Please refer https://github.com/paritytech/substrate/blob/493b58bd4a475080d428ce47193ee9ea9757a808/frame/contracts/src/lib.rs#L178
+/// for how contract's address is calculated.
 pub fn pair_for(
     factory: &[u8; 32],
     pair_code_hash: &[u8],
@@ -64,12 +70,6 @@ pub fn pair_for(
     Ok(output.into())
 }
 
-/// Original Uniswap Library pairFor function calculate pair contract address without making cross contract calls.
-/// Please refer https://github.com/Uniswap/v2-periphery/blob/master/contracts/libraries/UniswapV2Library.sol#L18
-///
-/// In this contract, use precomputed address like Uniswap's, as ink!'s deployment is done via create2-like one by default.
-/// Please refer https://github.com/paritytech/substrate/blob/493b58bd4a475080d428ce47193ee9ea9757a808/frame/contracts/src/lib.rs#L178
-/// for how contract's address is calculated.
 pub fn get_reserves(
     factory: &[u8; 32],
     pair_code_hash: &[u8],
