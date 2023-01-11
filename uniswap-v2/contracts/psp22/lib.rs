@@ -71,15 +71,24 @@ pub mod token {
 
     impl MyPSP22 {
         #[ink(constructor)]
-        pub fn new(total_supply: Balance) -> Self {
+        pub fn new(
+            total_supply: Balance,
+            name: Option<String>,
+            symbol: Option<String>,
+            decimals: u8,
+        ) -> Self {
             let mut instance = Self::default();
-            instance.metadata.name = Some(String::from("UNI TOKEN"));
-            instance.metadata.symbol = Some(String::from("UNI"));
-            instance.metadata.decimals = 18;
+            instance.metadata.name = name;
+            instance.metadata.symbol = symbol;
+            instance.metadata.decimals = decimals;
             instance
                 ._mint_to(instance.env().caller(), total_supply)
                 .expect("Should mint");
             instance
+        }
+        #[ink(message)]
+        pub fn mint(&mut self, account: AccountId, amount: Balance) -> Result<(), PSP22Error> {
+            self._mint_to(account, amount)
         }
     }
 }
