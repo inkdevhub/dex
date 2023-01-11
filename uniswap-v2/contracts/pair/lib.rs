@@ -21,6 +21,7 @@ pub mod pair {
     use uniswap_v2::{
         ensure,
         impls::pair::*,
+        traits::pair::*,
     };
 
     #[ink(event)]
@@ -240,7 +241,7 @@ pub mod pair {
         }
     }
 
-    // impl Pair for PairContract {}
+    impl Pair for PairContract {}
 
     impl PairContract {
         #[ink(constructor)]
