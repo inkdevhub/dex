@@ -19,5 +19,4 @@ pub struct Data {
     pub price_0_cumulative_last: WrappedU256,
     pub price_1_cumulative_last: WrappedU256,
     pub k_last: WrappedU256,
-    pub lock: bool,
 }
