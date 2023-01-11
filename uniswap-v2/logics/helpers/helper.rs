@@ -2,11 +2,13 @@ use crate::{
     helpers::math::casted_mul,
     traits::pair::PairRef,
 };
-use ink_env::hash::{
-    Blake2x256,
-    HashOutput,
+use ink::{
+    env::hash::{
+        Blake2x256,
+        HashOutput,
+    },
+    prelude::vec::Vec,
 };
-use ink_prelude::vec::Vec;
 use openbrush::traits::{
     AccountId,
     AccountIdExt,
@@ -50,7 +52,7 @@ pub fn pair_for(
 ) -> Result<AccountId, HelperError> {
     let tokens = sort_tokens(token_a, token_b)?;
     let mut output = <Blake2x256 as HashOutput>::Type::default();
-    ink_env::hash_encoded::<Blake2x256, _>(&tokens, &mut output);
+    ink::env::hash_encoded::<Blake2x256, _>(&tokens, &mut output);
     let salt = &output[..4];
     let input: Vec<_> = factory
         .iter()
@@ -58,7 +60,7 @@ pub fn pair_for(
         .chain(salt)
         .cloned()
         .collect();
-    ink_env::hash_bytes::<Blake2x256>(&input, &mut output);
+    ink::env::hash_bytes::<Blake2x256>(&input, &mut output);
     Ok(output.into())
 }
 

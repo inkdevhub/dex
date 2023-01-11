@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "uniswap-v2/contracts/**",
+    "uniswap-v2/contracts/psp22",
+    "uniswap-v2/contracts/pair",
 ]
 
 exclude = [

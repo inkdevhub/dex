@@ -1,5 +1,5 @@
 use crate::traits::pair::PairError;
-use ink_env::Hash;
+use ink::primitives::Hash;
 use openbrush::traits::AccountId;
 
 #[openbrush::wrapper]

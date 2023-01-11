@@ -3,11 +3,10 @@
 
 #[openbrush::contract]
 pub mod token {
-    use ink_lang::codegen::{
+    use ink::codegen::{
         EmitEvent,
         Env,
     };
-    use ink_storage::traits::SpreadAllocate;
     use openbrush::{
         contracts::psp22::extensions::metadata::*,
         traits::{
@@ -35,7 +34,7 @@ pub mod token {
     }
 
     #[ink(storage)]
-    #[derive(Default, SpreadAllocate, Storage)]
+    #[derive(Default, Storage)]
     pub struct MyPSP22 {
         #[storage_field]
         psp22: psp22::Data,
@@ -73,14 +72,14 @@ pub mod token {
     impl MyPSP22 {
         #[ink(constructor)]
         pub fn new(total_supply: Balance) -> Self {
-            ink_lang::codegen::initialize_contract(|instance: &mut MyPSP22| {
-                instance.metadata.name = Some(String::from("UNI TOKEN"));
-                instance.metadata.symbol = Some(String::from("UNI"));
-                instance.metadata.decimals = 18;
-                instance
-                    ._mint_to(instance.env().caller(), total_supply)
-                    .expect("Should mint");
-            })
+            let mut instance = Self::default();
+            instance.metadata.name = Some(String::from("UNI TOKEN"));
+            instance.metadata.symbol = Some(String::from("UNI"));
+            instance.metadata.decimals = 18;
+            instance
+                ._mint_to(instance.env().caller(), total_supply)
+                .expect("Should mint");
+            instance
         }
     }
 }
