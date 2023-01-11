@@ -36,7 +36,7 @@ export function revertedWith(
   errorTitle: any,
 ): void {
   if (result.value instanceof Result) {
-    result.value = result.value.ok
+    result.value = result.value.ok;
   }
   if (typeof errorTitle === 'object') {
     expect(result.value).toHaveProperty('err', errorTitle);
@@ -54,13 +54,19 @@ export async function changeTokenBalances<T>(
   const accounts = actors.map((actor) => actor.address);
   const beforeBalances = await Promise.all(
     accounts.map(
-      async (account) => (await token.query.balanceOf(account)).value.ok.rawNumber,
+      async (account) =>
+        (
+          await token.query.balanceOf(account)
+        ).value.ok.rawNumber,
     ),
   );
   const result = await txThunk();
   const afterBalances = await Promise.all(
     accounts.map(
-      async (account) => (await token.query.balanceOf(account)).value.ok.rawNumber,
+      async (account) =>
+        (
+          await token.query.balanceOf(account)
+        ).value.ok.rawNumber,
     ),
   );
   const changes = afterBalances.map((afterBalance, i) =>
