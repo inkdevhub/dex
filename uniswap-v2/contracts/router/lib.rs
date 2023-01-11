@@ -3,7 +3,6 @@
 
 #[openbrush::contract]
 pub mod router {
-    use ink_storage::traits::SpreadAllocate;
     use openbrush::traits::Storage;
     use uniswap_v2::{
         impls::router::*,
@@ -11,7 +10,7 @@ pub mod router {
     };
 
     #[ink(storage)]
-    #[derive(Default, SpreadAllocate, Storage)]
+    #[derive(Default, Storage)]
     pub struct RouterContract {
         #[storage_field]
         router: data::Data,
@@ -22,11 +21,11 @@ pub mod router {
     impl RouterContract {
         #[ink(constructor)]
         pub fn new(factory: AccountId, wnative: AccountId, pair_code_hash: Hash) -> Self {
-            ink_lang::codegen::initialize_contract(|instance: &mut Self| {
-                instance.router.factory = factory;
-                instance.router.wnative = wnative;
-                instance.router.pair_code_hash = pair_code_hash;
-            })
+            let mut instance = Self::default();
+            instance.router.factory = factory;
+            instance.router.wnative = wnative;
+            instance.router.pair_code_hash = pair_code_hash;
+            instance
         }
     }
 

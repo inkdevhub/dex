@@ -1,4 +1,6 @@
 #[cfg(feature = "std")]
+use ink::primitives::Key;
+#[cfg(feature = "std")]
 use ink::storage::traits::StorageLayout;
 #[cfg(feature = "std")]
 use ink_metadata::layout::{
@@ -11,14 +13,9 @@ use scale::{
     Decode,
     Encode,
 };
-#[cfg(feature = "std")]
-use ink::primitives::Key;
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Encode, Decode)]
-#[cfg_attr(
-    feature = "std",
-    derive(scale_info::TypeInfo)
-)]
+#[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
 pub struct WrappedU256(U256);
 
 impl From<WrappedU256> for U256 {
