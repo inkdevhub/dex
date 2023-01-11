@@ -1,0 +1,31 @@
+diff --git a/node_modules/@727-ventures/typechain-types/dist/src/query.d.ts b/node_modules/@727-ventures/typechain-types/dist/src/query.d.ts
+index dc837a5..2fccd69 100644
+--- a/node_modules/@727-ventures/typechain-types/dist/src/query.d.ts
++++ b/node_modules/@727-ventures/typechain-types/dist/src/query.d.ts
+@@ -1,12 +1,12 @@
+ import type { ContractPromise } from "@polkadot/api-contract";
+ import type { AnyJson } from '@polkadot/types-codec/types';
+ import type { RequestArgumentType, GasLimitAndValue } from './types';
+-import { Weight } from '@polkadot/types/interfaces';
++import { WeightV2 } from '@polkadot/types/interfaces';
+ import { ApiPromise } from "@polkadot/api";
+ type QueryReturnType<T> = {
+     value: T;
+-    gasConsumed: Weight;
+-    gasRequired: Weight;
++    gasConsumed: WeightV2;
++    gasRequired: WeightV2;
+ };
+ export type { QueryReturnType, };
+ export { _genValidGasLimitAndValue, };
+@@ -25,8 +25,8 @@ export declare function queryOkJSON<T>(api: ApiPromise, nativeContract: Contract
+  */
+ export declare function queryOutput(api: ApiPromise, nativeContract: ContractPromise, callerAddress: string, title: string, args?: readonly RequestArgumentType[], gasLimitAndValue?: GasLimitAndValue): Promise<{
+     output: import("@polkadot/types-codec/types").Codec;
+-    gasConsumed: Weight;
+-    gasRequired: Weight;
++    gasConsumed: WeightV2;
++    gasRequired: WeightV2;
+ }>;
+ declare function _genValidGasLimitAndValue(api: ApiPromise, gasLimitAndValue?: GasLimitAndValue): Promise<GasLimitAndValue>;
+ export declare function handleReturnType(result: any, typeDescription: any): any;

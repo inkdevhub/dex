@@ -3,11 +3,10 @@
 
 #[openbrush::contract]
 pub mod wnative {
-    use ink_lang::codegen::{
+    use ink::codegen::{
         EmitEvent,
         Env,
     };
-    use ink_storage::traits::SpreadAllocate;
     use openbrush::{
         contracts::psp22::extensions::metadata::*,
         traits::{
@@ -36,7 +35,7 @@ pub mod wnative {
     }
 
     #[ink(storage)]
-    #[derive(Default, SpreadAllocate, Storage)]
+    #[derive(Default, Storage)]
     pub struct WnativeContract {
         #[storage_field]
         psp22: psp22::Data,
@@ -76,11 +75,11 @@ pub mod wnative {
     impl WnativeContract {
         #[ink(constructor)]
         pub fn new() -> Self {
-            ink_lang::codegen::initialize_contract(|instance: &mut WnativeContract| {
-                instance.metadata.name = Some(String::from("Wrapped Native"));
-                instance.metadata.symbol = Some(String::from("WNATIVE"));
-                instance.metadata.decimals = 18;
-            })
+            let mut instance = Self::default();
+            instance.metadata.name = Some(String::from("Wrapped Native"));
+            instance.metadata.symbol = Some(String::from("WNATIVE"));
+            instance.metadata.decimals = 18;
+            instance
         }
     }
 

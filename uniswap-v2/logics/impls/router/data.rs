@@ -1,4 +1,4 @@
-use ink_env::Hash;
+use ink::primitives::Hash;
 use openbrush::traits::AccountId;
 
 pub const STORAGE_KEY: u32 = openbrush::storage_unique_key!(Data);

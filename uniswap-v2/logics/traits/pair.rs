@@ -1,3 +1,4 @@
+use ink::LangError;
 use openbrush::{
     contracts::{
         reentrancy_guard::*,
@@ -65,6 +66,7 @@ pub enum PairError {
     PSP22Error(PSP22Error),
     OwnableError(OwnableError),
     ReentrancyGuardError(ReentrancyGuardError),
+    LangError(LangError),
     TransferError,
     K,
     InsufficientLiquidityMinted,
@@ -129,5 +131,11 @@ impl From<PSP22Error> for PairError {
 impl From<ReentrancyGuardError> for PairError {
     fn from(error: ReentrancyGuardError) -> Self {
         PairError::ReentrancyGuardError(error)
+    }
+}
+
+impl From<LangError> for PairError {
+    fn from(error: LangError) -> Self {
+        PairError::LangError(error)
     }
 }

@@ -1,5 +1,7 @@
-use ink_env::Hash;
-use ink_prelude::vec::Vec;
+use ink::{
+    prelude::vec::Vec,
+    primitives::Hash,
+};
 use openbrush::{
     storage::Mapping,
     traits::AccountId,

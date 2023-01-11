@@ -24,8 +24,10 @@ use crate::{
         pair::PairRef,
     },
 };
-use ink_env::CallFlags;
-use ink_prelude::vec::Vec;
+use ink::{
+    env::CallFlags,
+    prelude::vec::Vec,
+};
 use openbrush::{
     contracts::traits::psp22::PSP22Ref,
     modifier_definition,
@@ -177,8 +179,13 @@ impl<T: Storage<data::Data>> Router for T {
         {
             Ok(res) => {
                 match res {
-                    Ok(v) => Ok(v),
-                    Err(err) => Err(RouterError::PairError(err)),
+                    Ok(v) => {
+                        match v {
+                            Ok(tuple) => Ok(tuple),
+                            Err(err) => Err(RouterError::PairError(err)),
+                        }
+                    }
+                    Err(_) => Err(RouterError::TransferError),
                 }
             }
             Err(_) => Err(RouterError::TransferError),
@@ -531,7 +538,7 @@ impl<T: Storage<data::Data>> Internal for T {
             } else {
                 _to
             };
-            match PairRef::swap_builder(
+            return match PairRef::swap_builder(
                 &pair_for(factory_ref, pair_hash, input, output)?,
                 amount_0_out,
                 amount_1_out,
@@ -542,12 +549,17 @@ impl<T: Storage<data::Data>> Internal for T {
             {
                 Ok(res) => {
                     match res {
-                        Ok(v) => Ok(v),
-                        Err(err) => Err(RouterError::PairError(err)),
+                        Ok(v) => {
+                            match v {
+                                Ok(v) => Ok(v),
+                                Err(err) => Err(RouterError::PairError(err)),
+                            }
+                        }
+                        Err(err) => Err(RouterError::LangError(err)),
                     }
                 }
                 Err(_) => Err(RouterError::TransferError),
-            }?;
+            }
         }
         Ok(())
     }
