@@ -12,7 +12,7 @@ import Router from '../types/contracts/router_contract';
 import 'dotenv/config';
 
 // Create a new instance of contract
-const wsProvider = new WsProvider('wss://public-rpc.pinknode.io/shibuya');
+const wsProvider = new WsProvider('wss://rpc.shibuya.astar.network');
 // Create a keyring instance
 const keyring = new Keyring({ type: 'sr25519' });
 
