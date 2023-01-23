@@ -31,5 +31,8 @@
   "resolutions": {
     "@polkadot/api": "^9.10.3",
     "@polkadot/api-contract": "^9.10.3"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.3"
   }
 }
