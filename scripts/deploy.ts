@@ -68,7 +68,8 @@ async function main(): Promise<void> {
     fs.readFileSync(__dirname + `/../artifacts/pair_contract.contract`, 'utf8'),
   );
   const pairAbi = new Abi(pairContractRaw);
-  api.tx.contracts.uploadCode(pairAbi.info.source.wasm, null, 'Deterministic');
+  const deployedHash = await api.tx.contracts.uploadCode(pairAbi.info.source.wasm, null, 'Deterministic').signAndSend(deployer);
+  console.log('pair deployed with', deployedHash.toHuman())
   const pairHash = pairAbi.info.source.wasmHash.toHex();
 
   const factoryContractRaw = JSON.parse(
@@ -149,6 +150,118 @@ async function main(): Promise<void> {
     { gasLimit: gasRequired },
   );
   console.log('router address:', routerAddress);
+  const router = new Router(routerAddress, deployer, api);
+
+  const deadline = '111111111111111111';
+  const aploAmount = parseUnits(100).toString();
+  const oneSby = parseUnits(1).toString();
+  const oneStableCoinAmount = parseUnits(100, 6).toString();
+  ({ gasRequired } = await aplo.query.approve(router.address, aploAmount));
+  await aplo.tx.approve(router.address, aploAmount, {
+    gasLimit: gasRequired,
+  });
+  ({ gasRequired } = await router.query.addLiquidityNative(
+    aplo.address,
+    aploAmount,
+    aploAmount,
+    oneSby,
+    deployer.address,
+    deadline,
+    {
+      value: oneSby,
+    },
+  ));
+  await router.tx.addLiquidityNative(
+    aplo.address,
+    aploAmount,
+    aploAmount,
+    oneSby,
+    deployer.address,
+    deadline,
+    {
+      gasLimit: gasRequired,
+      value: oneSby,
+    },
+  );
+
+  ({ gasRequired } = await usdc.query.approve(
+    router.address,
+    oneStableCoinAmount,
+  ));
+  await usdc.tx.approve(router.address, oneStableCoinAmount, {
+    gasLimit: gasRequired,
+  });
+  ({ gasRequired } = await router.query.addLiquidityNative(
+    usdc.address,
+    oneStableCoinAmount,
+    oneStableCoinAmount,
+    oneSby,
+    deployer.address,
+    deadline,
+    {
+      value: oneSby,
+    },
+  ));
+  await router.tx.addLiquidityNative(
+    usdc.address,
+    oneStableCoinAmount,
+    oneStableCoinAmount,
+    oneSby,
+    deployer.address,
+    deadline,
+    {
+      gasLimit: gasRequired,
+      value: oneSby,
+    },
+  );
+
+  ({ gasRequired } = await usdt.query.approve(
+    router.address,
+    oneStableCoinAmount,
+  ));
+  await usdt.tx.approve(router.address, oneStableCoinAmount, {
+    gasLimit: gasRequired,
+  });
+  ({ gasRequired } = await router.query.addLiquidityNative(
+    usdt.address,
+    oneStableCoinAmount,
+    oneStableCoinAmount,
+    oneSby,
+    deployer.address,
+    deadline,
+    {
+      value: oneSby,
+    },
+  ));
+  await router.tx.addLiquidityNative(
+    usdt.address,
+    oneStableCoinAmount,
+    oneStableCoinAmount,
+    oneSby,
+    deployer.address,
+    deadline,
+    {
+      gasLimit: gasRequired,
+      value: oneSby,
+    },
+  );
+
+  const { value: aploSbyAddress } = await factory.query.getPair(
+    aplo.address,
+    wnativeAddress,
+  );
+  console.log('aploSbyAddress', aploSbyAddress);
+  const { value: usdcSbyAddress } = await factory.query.getPair(
+    usdc.address,
+    wnativeAddress,
+  );
+  console.log('usdcSbyAddress', usdcSbyAddress);
+  const { value: usdtSbyAddress } = await factory.query.getPair(
+    usdt.address,
+    wnativeAddress,
+  );
+  console.log('usdtSbyAddress', usdtSbyAddress);
+  await api.disconnect();
 }
 
 main().catch((error) => {
