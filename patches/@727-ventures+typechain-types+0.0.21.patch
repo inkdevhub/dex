@@ -1,5 +1,5 @@
 diff --git a/node_modules/@727-ventures/typechain-types/dist/src/query.d.ts b/node_modules/@727-ventures/typechain-types/dist/src/query.d.ts
-index dc837a5..2fccd69 100644
+index dc837a5..1c74218 100644
 --- a/node_modules/@727-ventures/typechain-types/dist/src/query.d.ts
 +++ b/node_modules/@727-ventures/typechain-types/dist/src/query.d.ts
 @@ -1,12 +1,12 @@
@@ -29,3 +29,16 @@ index dc837a5..2fccd69 100644
  }>;
  declare function _genValidGasLimitAndValue(api: ApiPromise, gasLimitAndValue?: GasLimitAndValue): Promise<GasLimitAndValue>;
  export declare function handleReturnType(result: any, typeDescription: any): any;
+diff --git a/node_modules/@727-ventures/typechain-types/dist/src/tx.js b/node_modules/@727-ventures/typechain-types/dist/src/tx.js
+index e15b609..cd5f6ae 100644
+--- a/node_modules/@727-ventures/typechain-types/dist/src/tx.js
++++ b/node_modules/@727-ventures/typechain-types/dist/src/tx.js
+@@ -116,7 +116,7 @@ function _signAndSend(registry, extrinsic, signer, eventHandler) {
+                         if (result.status.isInBlock) {
+                             actionStatus.blockHash = result.status.asInBlock.toHex();
+                         }
+-                        if (result.status.isFinalized || result.status.isInBlock) {
++                        if (result.status.isFinalized) {
+                             actionStatus.events = eventHandler(result.events);
+                             result.events
+                                 .filter(function (_a) {
