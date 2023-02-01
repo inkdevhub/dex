@@ -465,7 +465,7 @@ impl<T: Storage<data::Data> + Storage<psp22::Data>> Internal for T {
         self.data::<data::Data>().reserve_1 = balance_1;
         self.data::<data::Data>().block_timestamp_last = now;
 
-        self._emit_sync_event(reserve_0, reserve_1);
+        self._emit_sync_event(balance_0, balance_1);
         Ok(())
     }
 
