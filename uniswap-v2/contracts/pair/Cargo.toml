@@ -5,12 +5,12 @@ authors = ["Stake Technologies <devops@stake.co.jp>"]
 edition = "2021"
 
 [dependencies]
-ink = { git = "https://github.com/paritytech/ink", rev = "4655a8b4413cb50cbc38d1b7c173ad426ab06cde", default-features = false}
+ink = { version = "~4.0.0-rc", default-features = false}
 
 scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
 scale-info = { version = "2.3", default-features = false, features = ["derive"], optional = true }
 
-openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts", default-features = false, features = ["psp22", "ownable", "reentrancy_guard"] }
+openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts", version = "3.0.0-beta.1", default-features = false, features = ["psp22", "ownable", "reentrancy_guard"] }
 uniswap_v2 = { path = "../../logics", default-features = false }
 
 [lib]
