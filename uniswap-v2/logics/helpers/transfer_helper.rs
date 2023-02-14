@@ -39,7 +39,7 @@ pub fn safe_transfer_from(
 pub fn wrap(wnative: &AccountId, value: Balance) -> Result<(), PSP22Error> {
     match WnativeRef::deposit_builder(wnative)
         .transferred_value(value)
-        .fire()
+        .try_invoke()
     {
         Ok(res) => {
             match res {

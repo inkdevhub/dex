@@ -175,7 +175,7 @@ impl<T: Storage<data::Data>> Router for T {
 
         let (amount_0, amount_1) = match PairRef::burn_builder(&pair_contract, to)
             .call_flags(CallFlags::default().set_allow_reentry(true))
-            .fire()
+            .try_invoke()
         {
             Ok(res) => {
                 match res {
@@ -545,7 +545,7 @@ impl<T: Storage<data::Data>> Internal for T {
                 to,
             )
             .call_flags(CallFlags::default().set_allow_reentry(true))
-            .fire()
+            .try_invoke()
             {
                 Ok(res) => {
                     match res {
