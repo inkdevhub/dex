@@ -1,0 +1,13 @@
+diff --git a/node_modules/@727-ventures/typechain-compiler/index.ts b/node_modules/@727-ventures/typechain-compiler/index.ts
+index 1d158f5..b1577fd 100644
+--- a/node_modules/@727-ventures/typechain-compiler/index.ts
++++ b/node_modules/@727-ventures/typechain-compiler/index.ts
+@@ -111,7 +111,7 @@ function main() {
+ 			__writeFileSync(
+ 				artifactsPath,
+ 				`${targetInfo.name}.json`,
+-				FsAPI.readFileSync(PathAPI.resolve(targetInfo.path, 'metadata.json'), "utf8")
++				FsAPI.readFileSync(PathAPI.resolve(targetInfo.path, `${targetInfo.name}.json`), "utf8")
+ 			);
+ 
+ 			__writeFileSync(
