@@ -87,7 +87,7 @@ pub mod wnative {
     mod tests {
         use super::*;
 
-        #[ink_lang::test]
+        #[ink::test]
         fn register_works() {
             let wnative_contract = WnativeContract::new();
             assert_eq!(
@@ -100,7 +100,7 @@ pub mod wnative {
             );
         }
 
-        #[ink_lang::test]
+        #[ink::test]
         fn test_deposit() {
             let accounts = default_accounts();
             let mut wnative_contract = create_contract(0);
@@ -111,7 +111,7 @@ pub mod wnative {
             assert_eq!(native_balance, 1000, "native balance not correct!");
         }
 
-        #[ink_lang::test]
+        #[ink::test]
         fn test_withdraw() {
             let accounts = default_accounts();
             let mut wnative_contract = create_contract(1000);
@@ -135,16 +135,16 @@ pub mod wnative {
             assert_eq!(wnative_balance, 200, "balance not correct!");
         }
 
-        fn default_accounts() -> ink_env::test::DefaultAccounts<ink_env::DefaultEnvironment> {
-            ink_env::test::default_accounts()
+        fn default_accounts() -> ink::env::test::DefaultAccounts<ink::env::DefaultEnvironment> {
+            ink::env::test::default_accounts()
         }
 
         fn set_next_caller(caller: AccountId) {
-            ink_env::test::set_caller::<Environment>(caller);
+            ink::env::test::set_caller::<Environment>(caller);
         }
 
         fn set_balance(account_id: AccountId, balance: Balance) {
-            ink_env::test::set_account_balance::<ink_env::DefaultEnvironment>(account_id, balance)
+            ink::env::test::set_account_balance::<ink::env::DefaultEnvironment>(account_id, balance)
         }
 
         /// Creates a new instance of `WnativeContract` with `initial_balance`.
@@ -158,16 +158,16 @@ pub mod wnative {
         }
 
         fn contract_id() -> AccountId {
-            ink_env::test::callee::<ink_env::DefaultEnvironment>()
+            ink::env::test::callee::<ink::env::DefaultEnvironment>()
         }
 
         fn get_balance(account_id: AccountId) -> Balance {
-            ink_env::test::get_account_balance::<ink_env::DefaultEnvironment>(account_id)
+            ink::env::test::get_account_balance::<ink::env::DefaultEnvironment>(account_id)
                 .expect("Cannot get account balance")
         }
 
         fn deposit(contract: &mut WnativeContract, amount: Balance) -> Result<(), PSP22Error> {
-            let sender = ink_env::caller::<ink_env::DefaultEnvironment>();
+            let sender = ink::env::caller::<ink::env::DefaultEnvironment>();
             let contract_id = contract.env().account_id();
             let sender_balance = get_balance(sender);
             let contract_balance = get_balance(contract_id);
@@ -182,7 +182,7 @@ pub mod wnative {
                 },
             );
             set_balance(contract_id, contract_balance + amount);
-            ink_env::test::set_value_transferred::<ink_env::DefaultEnvironment>(amount);
+            ink::env::test::set_value_transferred::<ink::env::DefaultEnvironment>(amount);
             contract.deposit()
         }
     }

@@ -1,0 +1,34 @@
+name: PR checks
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  checks-and-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the source code
+      uses: actions/checkout@v3
+
+    - name: Install & display rust toolchain
+      run: rustup show
+
+    - name: Check targets are installed correctly
+      run: rustup target list --installed
+
+    - name: Install cargo contract
+      run: |
+        rustup component add rust-src
+        sudo apt-get install binaryen
+        cargo install cargo-dylint dylint-link
+        # Until 2.0.0 official release, we need to specify --version expressly
+        cargo install --force --locked cargo-contract --version 2.0.0-rc
+
+    - name: Compile checks
+      run: |
+        manifest_paths=(`find uniswap-v2/contracts -type f -name Cargo.toml`)
+        for path in $manifest_paths; do
+          cargo contract check --manifest-path $path
+        done
+
+    - name: test
+      run: cargo contract test

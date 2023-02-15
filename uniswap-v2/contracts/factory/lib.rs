@@ -80,17 +80,15 @@ pub mod factory {
     }
     #[cfg(test)]
     mod tests {
-        use ink_env::{
-            test::default_accounts,
-            Hash,
-        };
+        use ink::env::test::default_accounts;
+        use ink::primitives::Hash;
         use openbrush::traits::AccountIdExt;
 
         use super::*;
 
-        #[ink_lang::test]
+        #[ink::test]
         fn initialize_works() {
-            let accounts = default_accounts::<ink_env::DefaultEnvironment>();
+            let accounts = default_accounts::<ink::env::DefaultEnvironment>();
             let factory = FactoryContract::new(accounts.alice, Hash::default());
             assert!(factory.factory.fee_to.is_zero());
         }

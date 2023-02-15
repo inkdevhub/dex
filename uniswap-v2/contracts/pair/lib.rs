@@ -255,11 +255,9 @@ pub mod pair {
     }
     #[cfg(test)]
     mod tests {
-        use ink_env::AccountId;
-
         use super::*;
 
-        #[ink_lang::test]
+        #[ink::test]
         fn initialize_works() {
             let mut pair = PairContract::new();
             let token_0 = AccountId::from([0x03; 32]);

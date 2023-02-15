@@ -33,9 +33,7 @@ pub mod router {
     mod tests {
         use super::*;
 
-        use ink_env::AccountId;
-
-        #[ink_lang::test]
+        #[ink::test]
         fn initialize_works() {
             let factory = AccountId::from([0x03; 32]);
             let wnative = AccountId::from([0x04; 32]);
