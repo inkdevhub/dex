@@ -40,8 +40,8 @@ jobs:
     - name: Compile checks
       run: |
         manifest_paths=(`find uniswap-v2/contracts -type f -name Cargo.toml`)
-        for path in $manifest_paths; do
-          cargo contract check --manifest-path $path
+        for manifest_path in $manifest_paths; do
+          cargo contract check --manifest-path $manifest_path
         done
 
     - name: test
