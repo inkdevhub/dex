@@ -40,7 +40,7 @@ jobs:
 
     - name: Compile checks
       run: |
-        manifest_paths=(`find uniswap-v2/contracts -type f -name Cargo.toml`)
+        manifest_paths=`find uniswap-v2/contracts -type f -name Cargo.toml`
         echo $manifest_paths
         for manifest_path in $manifest_paths; do
           echo $manifest_path
