@@ -20,8 +20,8 @@ jobs:
       with:
         path: ~/.cargo 
         key: rust-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml') }}
-          restore-keys: |
-            rust-${{ runner.os }}-
+        restore-keys: |
+          rust-${{ runner.os }}-
 
     - name: Check if cargo-contract exists
       id: check-cargo-contract
