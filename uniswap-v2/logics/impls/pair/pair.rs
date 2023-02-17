@@ -499,14 +499,14 @@ mod tests {
 
     use super::update_cumulative;
 
-    #[test]
+    #[ink::test]
     fn update_cumulative_from_zero_time_elapsed() {
         let (cumulative0, cumulative1) = update_cumulative(0.into(), 0.into(), 0.into(), 10, 10);
         assert_eq!(cumulative0, 0.into());
         assert_eq!(cumulative1, 0.into());
     }
 
-    #[test]
+    #[ink::test]
     fn update_cumulative_from_one_time_elapsed() {
         let (cumulative0, cumulative1) = update_cumulative(0.into(), 0.into(), 1.into(), 10, 10);
         assert_eq!(
