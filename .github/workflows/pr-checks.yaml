@@ -36,7 +36,7 @@ jobs:
         sudo apt-get install binaryen
         cargo install cargo-dylint dylint-link
         # Until 2.0.0 official release, we need to specify --version expressly
-        cargo install --force --locked cargo-contract --version 2.0.0-rc
+        cargo install --force --locked cargo-contract --version 2.0.0
 
     - name: Compile checks
       run: |
@@ -48,4 +48,4 @@ jobs:
         done
 
     - name: test
-      run: cargo contract test
+      run: cargo test
