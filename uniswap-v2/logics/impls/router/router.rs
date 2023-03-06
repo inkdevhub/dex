@@ -125,7 +125,7 @@ impl<T: Storage<data::Data>> Router for T {
             amount_token_min,
             amount_native_min,
         )?;
-        let pair_contract = pair_for_on_chain(&self.data().factory, token_a, token_b).unwrap();
+        let pair_contract = pair_for_on_chain(&self.data().factory, token, wnative).unwrap();
 
         safe_transfer_from(token, caller, pair_contract, amount)?;
         wrap(&wnative, amount_native)?;
@@ -149,12 +149,7 @@ impl<T: Storage<data::Data>> Router for T {
         to: AccountId,
         deadline: u64,
     ) -> Result<(Balance, Balance), RouterError> {
-        let pair_contract = pair_for(
-            self.data().factory.clone().as_ref(),
-            self.data().pair_code_hash.as_ref(),
-            token_a,
-            token_b,
-        )?;
+        let pair_contract = pair_for_on_chain(&self.data().factory, token_a, token_b).unwrap();
 
         safe_transfer_from(
             pair_contract,
@@ -228,8 +223,9 @@ impl<T: Storage<data::Data>> Router for T {
         to: AccountId,
         deadline: u64,
     ) -> Result<Vec<Balance>, RouterError> {
-        let amounts = get_amounts_out(&factory, amount_in, &path)?;
         let factory = self.data().factory;
+
+        let amounts = get_amounts_out(&factory, amount_in, &path)?;
         ensure!(
             amounts[amounts.len() - 1] >= amount_out_min,
             RouterError::InsufficientOutputAmount
@@ -491,7 +487,7 @@ impl<T: Storage<data::Data>> Internal for T {
             } else {
                 _to
             };
-            return match PairRef::swap_builder(
+            match PairRef::swap_builder(
                 &pair_for_on_chain(&factory, input, output).unwrap(),
                 amount_0_out,
                 amount_1_out,
@@ -512,7 +508,7 @@ impl<T: Storage<data::Data>> Internal for T {
                     }
                 }
                 Err(_) => Err(RouterError::TransferError),
-            }
+            }?;
         }
         Ok(())
     }

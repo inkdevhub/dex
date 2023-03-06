@@ -1,6 +1,9 @@
 use crate::{
     helpers::math::casted_mul,
-    traits::pair::PairRef,
+    traits::{
+        factory::FactoryRef,
+        pair::PairRef,
+    },
 };
 use ink::prelude::vec::Vec;
 use openbrush::traits::{
