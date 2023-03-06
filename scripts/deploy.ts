@@ -68,8 +68,10 @@ async function main(): Promise<void> {
     fs.readFileSync(__dirname + `/../artifacts/pair_contract.contract`, 'utf8'),
   );
   const pairAbi = new Abi(pairContractRaw);
-  const deployedHash = await api.tx.contracts.uploadCode(pairAbi.info.source.wasm, null, 'Deterministic').signAndSend(deployer);
-  console.log('pair deployed with', deployedHash.toHuman())
+  const deployedHash = await api.tx.contracts
+    .uploadCode(pairAbi.info.source.wasm, null, 'Deterministic')
+    .signAndSend(deployer);
+  console.log('pair deployed with', deployedHash.toHuman());
   const pairHash = pairAbi.info.source.wasmHash.toHex();
 
   const factoryContractRaw = JSON.parse(
@@ -134,11 +136,7 @@ async function main(): Promise<void> {
     null,
     null,
     { Upload: routerAbi.info.source.wasm },
-    routerAbi.constructors[0].toU8a([
-      factory.address,
-      wnative.address,
-      pairHash,
-    ]),
+    routerAbi.constructors[0].toU8a([factory.address, wnative.address]),
     '',
   ));
 
@@ -146,7 +144,6 @@ async function main(): Promise<void> {
   const { address: routerAddress } = await routerFactory.new(
     factory.address,
     wnative.address,
-    pairHash,
     { gasLimit: gasRequired },
   );
   console.log('router address:', routerAddress);
@@ -246,20 +243,17 @@ async function main(): Promise<void> {
     },
   );
 
-  const { value: aploSbyAddress } = await factory.query.getPair(
-    aplo.address,
-    wnativeAddress,
-  );
+  const {
+    value: { ok: aploSbyAddress },
+  } = await factory.query.getPair(aplo.address, wnativeAddress);
   console.log('aploSbyAddress', aploSbyAddress);
-  const { value: usdcSbyAddress } = await factory.query.getPair(
-    usdc.address,
-    wnativeAddress,
-  );
+  const {
+    value: { ok: usdcSbyAddress },
+  } = await factory.query.getPair(usdc.address, wnativeAddress);
   console.log('usdcSbyAddress', usdcSbyAddress);
-  const { value: usdtSbyAddress } = await factory.query.getPair(
-    usdt.address,
-    wnativeAddress,
-  );
+  const {
+    value: { ok: usdtSbyAddress },
+  } = await factory.query.getPair(usdt.address, wnativeAddress);
   console.log('usdtSbyAddress', usdtSbyAddress);
   await api.disconnect();
 }

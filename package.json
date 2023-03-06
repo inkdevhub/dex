@@ -21,8 +21,8 @@
     "ts-node": "^10.8.0"
   },
   "scripts": {
-    "compile": "typechain-compiler --toolchain nightly-2022-10-10",
-    "compile:release": "typechain-compiler --release --toolchain nightly-2022-10-10",
+    "compile": "typechain-compiler --toolchain nightly-2023-01-10",
+    "compile:release": "typechain-compiler --release --toolchain nightly-2023-01-10",
     "test:typechain": "jest --testPathPattern \".spec.ts$\" --runInBand",
     "test:single": "jest",
     "lint": "prettier --check . && eslint . && cargo check",

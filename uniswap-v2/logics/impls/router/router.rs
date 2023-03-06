@@ -7,7 +7,7 @@ use crate::{
             get_amounts_in,
             get_amounts_out,
             get_reserves,
-            pair_for,
+            pair_for_on_chain,
             quote,
             sort_tokens,
         },
@@ -93,12 +93,7 @@ impl<T: Storage<data::Data>> Router for T {
             amount_b_min,
         )?;
 
-        let pair_contract = pair_for(
-            self.data().factory.clone().as_ref(),
-            self.data().pair_code_hash.as_ref(),
-            token_a,
-            token_b,
-        )?;
+        let pair_contract = pair_for_on_chain(&self.data().factory, token_a, token_b).unwrap();
 
         let caller = Self::env().caller();
         safe_transfer_from(token_a, caller, pair_contract, amount_a)?;
@@ -130,12 +125,7 @@ impl<T: Storage<data::Data>> Router for T {
             amount_token_min,
             amount_native_min,
         )?;
-        let pair_contract = pair_for(
-            self.data().factory.clone().as_ref(),
-            self.data().pair_code_hash.as_ref(),
-            token,
-            wnative,
-        )?;
+        let pair_contract = pair_for_on_chain(&self.data().factory, token_a, token_b).unwrap();
 
         safe_transfer_from(token, caller, pair_contract, amount)?;
         wrap(&wnative, amount_native)?;
@@ -238,12 +228,8 @@ impl<T: Storage<data::Data>> Router for T {
         to: AccountId,
         deadline: u64,
     ) -> Result<Vec<Balance>, RouterError> {
+        let amounts = get_amounts_out(&factory, amount_in, &path)?;
         let factory = self.data().factory;
-        let pair_hash = self.data().pair_code_hash;
-        let factory_ref = factory.as_ref();
-        let pair_hash_ref = pair_hash.as_ref();
-
-        let amounts = get_amounts_out(factory_ref, pair_hash_ref, amount_in, &path)?;
         ensure!(
             amounts[amounts.len() - 1] >= amount_out_min,
             RouterError::InsufficientOutputAmount
@@ -251,7 +237,7 @@ impl<T: Storage<data::Data>> Router for T {
         safe_transfer_from(
             path[0],
             Self::env().caller(),
-            pair_for(factory_ref, pair_hash_ref, path[0], path[1])?,
+            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
             amounts[0],
         )?;
         self._swap(&amounts, path, to)?;
@@ -268,11 +254,7 @@ impl<T: Storage<data::Data>> Router for T {
         deadline: u64,
     ) -> Result<Vec<Balance>, RouterError> {
         let factory = self.data().factory;
-        let pair_hash = self.data().pair_code_hash;
-        let factory_ref = factory.as_ref();
-        let pair_hash_ref = pair_hash.as_ref();
-
-        let amounts = get_amounts_in(factory_ref, pair_hash_ref, amount_out, &path)?;
+        let amounts = get_amounts_in(&factory, amount_out, &path)?;
         ensure!(
             amounts[0] <= amount_in_max,
             RouterError::ExcessiveInputAmount
@@ -280,7 +262,7 @@ impl<T: Storage<data::Data>> Router for T {
         safe_transfer_from(
             path[0],
             Self::env().caller(),
-            pair_for(factory_ref, pair_hash_ref, path[0], path[1])?,
+            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
             amounts[0],
         )?;
         self._swap(&amounts, path, to)?;
@@ -296,14 +278,11 @@ impl<T: Storage<data::Data>> Router for T {
         deadline: u64,
     ) -> Result<Vec<Balance>, RouterError> {
         let factory = self.data().factory;
-        let pair_hash = self.data().pair_code_hash;
-        let factory_ref = factory.as_ref();
-        let pair_hash_ref = pair_hash.as_ref();
 
         let received_value = Self::env().transferred_value();
         let wnative = self.data().wnative;
         ensure!(path[0] == wnative, RouterError::InvalidPath);
-        let amounts = get_amounts_out(factory_ref, pair_hash_ref, received_value, &path)?;
+        let amounts = get_amounts_out(&factory, received_value, &path)?;
         ensure!(
             amounts[amounts.len() - 1] >= amount_out_min,
             RouterError::InsufficientOutputAmount
@@ -311,7 +290,7 @@ impl<T: Storage<data::Data>> Router for T {
         wrap(&wnative, received_value)?;
         safe_transfer(
             wnative,
-            pair_for(factory_ref, pair_hash_ref, path[0], path[1])?,
+            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
             amounts[0],
         )?;
         self._swap(&amounts, path, to)?;
@@ -328,13 +307,10 @@ impl<T: Storage<data::Data>> Router for T {
         deadline: u64,
     ) -> Result<Vec<Balance>, RouterError> {
         let factory = self.data().factory;
-        let pair_hash = self.data().pair_code_hash;
-        let factory_ref = factory.as_ref();
-        let pair_hash_ref = pair_hash.as_ref();
 
         let wnative = self.data().wnative;
         ensure!(path[path.len() - 1] == wnative, RouterError::InvalidPath);
-        let amounts = get_amounts_in(factory_ref, pair_hash_ref, amount_out, &path)?;
+        let amounts = get_amounts_in(&factory, amount_out, &path)?;
         ensure!(
             amounts[0] <= amount_in_max,
             RouterError::ExcessiveInputAmount
@@ -342,7 +318,7 @@ impl<T: Storage<data::Data>> Router for T {
         safe_transfer_from(
             path[0],
             Self::env().caller(),
-            pair_for(factory_ref, pair_hash_ref, path[0], path[1])?,
+            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
             amounts[0],
         )?;
         self._swap(&amounts, path, Self::env().account_id())?;
@@ -361,13 +337,10 @@ impl<T: Storage<data::Data>> Router for T {
         deadline: u64,
     ) -> Result<Vec<Balance>, RouterError> {
         let factory = self.data().factory;
-        let pair_hash = self.data().pair_code_hash;
-        let factory_ref = factory.as_ref();
-        let pair_hash_ref = pair_hash.as_ref();
 
         let wnative = self.data().wnative;
         ensure!(path[path.len() - 1] == wnative, RouterError::InvalidPath);
-        let amounts = get_amounts_out(factory_ref, pair_hash_ref, amount_in, &path)?;
+        let amounts = get_amounts_out(&factory, amount_in, &path)?;
         ensure!(
             amounts[amounts.len() - 1] >= amount_out_min,
             RouterError::InsufficientOutputAmount
@@ -375,7 +348,7 @@ impl<T: Storage<data::Data>> Router for T {
         safe_transfer_from(
             path[0],
             Self::env().caller(),
-            pair_for(factory_ref, pair_hash_ref, path[0], path[1])?,
+            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
             amounts[0],
         )?;
         self._swap(&amounts, path, Self::env().account_id())?;
@@ -393,15 +366,11 @@ impl<T: Storage<data::Data>> Router for T {
         deadline: u64,
     ) -> Result<Vec<Balance>, RouterError> {
         let factory = self.data().factory;
-        let pair_hash = self.data().pair_code_hash;
-        let factory_ref = factory.as_ref();
-        let pair_hash_ref = pair_hash.as_ref();
-
         let wnative = self.data().wnative;
         let received_value = Self::env().transferred_value();
 
         ensure!(path[0] == wnative, RouterError::InvalidPath);
-        let amounts = get_amounts_in(factory_ref, pair_hash_ref, amount_out, &path)?;
+        let amounts = get_amounts_in(&factory, amount_out, &path)?;
         ensure!(
             amounts[0] <= received_value,
             RouterError::ExcessiveInputAmount
@@ -409,7 +378,7 @@ impl<T: Storage<data::Data>> Router for T {
         wrap(&wnative, amounts[0])?;
         safe_transfer(
             wnative,
-            pair_for(factory_ref, pair_hash_ref, path[0], path[1])?,
+            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
             amounts[0],
         )?;
         self._swap(&amounts, path, to)?;
@@ -451,12 +420,7 @@ impl<T: Storage<data::Data>> Router for T {
         amount_in: Balance,
         path: Vec<AccountId>,
     ) -> Result<Vec<Balance>, RouterError> {
-        Ok(get_amounts_out(
-            self.data().factory.as_ref(),
-            self.data().pair_code_hash.as_ref(),
-            amount_in,
-            &path,
-        )?)
+        Ok(get_amounts_out(&self.data().factory, amount_in, &path)?)
     }
 
     default fn get_amounts_in(
@@ -464,12 +428,7 @@ impl<T: Storage<data::Data>> Router for T {
         amount_out: Balance,
         path: Vec<AccountId>,
     ) -> Result<Vec<Balance>, RouterError> {
-        Ok(get_amounts_in(
-            self.data().factory.as_ref(),
-            self.data().pair_code_hash.as_ref(),
-            amount_out,
-            &path,
-        )?)
+        Ok(get_amounts_in(&self.data().factory, amount_out, &path)?)
     }
 }
 
@@ -483,16 +442,12 @@ impl<T: Storage<data::Data>> Internal for T {
         amount_a_min: Balance,
         amount_b_min: Balance,
     ) -> Result<(Balance, Balance), RouterError> {
-        if FactoryRef::get_pair(&self.data().factory, token_a, token_b).is_none() {
-            FactoryRef::create_pair(&self.data().factory, token_a, token_b)?;
+        let factory = self.data().factory;
+        if pair_for_on_chain(&factory, token_a, token_b).is_none() {
+            FactoryRef::create_pair(&factory, token_a, token_b)?;
         };
 
-        let (reserve_a, reserve_b) = get_reserves(
-            self.data().factory.as_ref(),
-            self.data().pair_code_hash.as_ref(),
-            token_a,
-            token_b,
-        )?;
+        let (reserve_a, reserve_b) = get_reserves(&factory, token_a, token_b)?;
         if reserve_a == 0 && reserve_b == 0 {
             return Ok((amount_a_desired, amount_b_desired))
         }
@@ -521,9 +476,7 @@ impl<T: Storage<data::Data>> Internal for T {
         path: Vec<AccountId>,
         _to: AccountId,
     ) -> Result<(), RouterError> {
-        let factory_ref = self.data().factory.as_ref();
-        let pair_hash = self.data().pair_code_hash.as_ref();
-
+        let factory = self.data().factory;
         for i in 0..path.len() - 1 {
             let (input, output) = (path[i], path[i + 1]);
             let (token_0, _) = sort_tokens(input, output)?;
@@ -534,12 +487,12 @@ impl<T: Storage<data::Data>> Internal for T {
                 (amount_out, 0)
             };
             let to = if i < path.len() - 2 {
-                pair_for(factory_ref, pair_hash, output, path[i + 2])?
+                pair_for_on_chain(&factory, output, path[i + 2]).unwrap()
             } else {
                 _to
             };
             return match PairRef::swap_builder(
-                &pair_for(factory_ref, pair_hash, input, output)?,
+                &pair_for_on_chain(&factory, input, output).unwrap(),
                 amount_0_out,
                 amount_1_out,
                 to,
