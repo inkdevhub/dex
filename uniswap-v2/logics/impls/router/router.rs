@@ -93,7 +93,8 @@ impl<T: Storage<data::Data>> Router for T {
             amount_b_min,
         )?;
 
-        let pair_contract = pair_for_on_chain(&self.data().factory, token_a, token_b).unwrap();
+        let pair_contract = pair_for_on_chain(&self.data().factory, token_a, token_b)
+            .ok_or(RouterError::PairNotFound)?;
 
         let caller = Self::env().caller();
         safe_transfer_from(token_a, caller, pair_contract, amount_a)?;
@@ -125,7 +126,8 @@ impl<T: Storage<data::Data>> Router for T {
             amount_token_min,
             amount_native_min,
         )?;
-        let pair_contract = pair_for_on_chain(&self.data().factory, token, wnative).unwrap();
+        let pair_contract = pair_for_on_chain(&self.data().factory, token, wnative)
+            .ok_or(RouterError::PairNotFound)?;
 
         safe_transfer_from(token, caller, pair_contract, amount)?;
         wrap(&wnative, amount_native)?;
@@ -149,7 +151,8 @@ impl<T: Storage<data::Data>> Router for T {
         to: AccountId,
         deadline: u64,
     ) -> Result<(Balance, Balance), RouterError> {
-        let pair_contract = pair_for_on_chain(&self.data().factory, token_a, token_b).unwrap();
+        let pair_contract = pair_for_on_chain(&self.data().factory, token_a, token_b)
+            .ok_or(RouterError::PairNotFound)?;
 
         safe_transfer_from(
             pair_contract,
@@ -233,7 +236,7 @@ impl<T: Storage<data::Data>> Router for T {
         safe_transfer_from(
             path[0],
             Self::env().caller(),
-            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
+            pair_for_on_chain(&factory, path[0], path[1]).ok_or(RouterError::PairNotFound)?,
             amounts[0],
         )?;
         self._swap(&amounts, path, to)?;
@@ -258,7 +261,7 @@ impl<T: Storage<data::Data>> Router for T {
         safe_transfer_from(
             path[0],
             Self::env().caller(),
-            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
+            pair_for_on_chain(&factory, path[0], path[1]).ok_or(RouterError::PairNotFound)?,
             amounts[0],
         )?;
         self._swap(&amounts, path, to)?;
@@ -286,7 +289,7 @@ impl<T: Storage<data::Data>> Router for T {
         wrap(&wnative, received_value)?;
         safe_transfer(
             wnative,
-            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
+            pair_for_on_chain(&factory, path[0], path[1]).ok_or(RouterError::PairNotFound)?,
             amounts[0],
         )?;
         self._swap(&amounts, path, to)?;
@@ -314,7 +317,7 @@ impl<T: Storage<data::Data>> Router for T {
         safe_transfer_from(
             path[0],
             Self::env().caller(),
-            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
+            pair_for_on_chain(&factory, path[0], path[1]).ok_or(RouterError::PairNotFound)?,
             amounts[0],
         )?;
         self._swap(&amounts, path, Self::env().account_id())?;
@@ -344,7 +347,7 @@ impl<T: Storage<data::Data>> Router for T {
         safe_transfer_from(
             path[0],
             Self::env().caller(),
-            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
+            pair_for_on_chain(&factory, path[0], path[1]).ok_or(RouterError::PairNotFound)?,
             amounts[0],
         )?;
         self._swap(&amounts, path, Self::env().account_id())?;
@@ -374,7 +377,7 @@ impl<T: Storage<data::Data>> Router for T {
         wrap(&wnative, amounts[0])?;
         safe_transfer(
             wnative,
-            pair_for_on_chain(&factory, path[0], path[1]).unwrap(),
+            pair_for_on_chain(&factory, path[0], path[1]).ok_or(RouterError::PairNotFound)?,
             amounts[0],
         )?;
         self._swap(&amounts, path, to)?;
@@ -483,12 +486,12 @@ impl<T: Storage<data::Data>> Internal for T {
                 (amount_out, 0)
             };
             let to = if i < path.len() - 2 {
-                pair_for_on_chain(&factory, output, path[i + 2]).unwrap()
+                pair_for_on_chain(&factory, output, path[i + 2]).ok_or(RouterError::PairNotFound)?
             } else {
                 _to
             };
             match PairRef::swap_builder(
-                &pair_for_on_chain(&factory, input, output).unwrap(),
+                &pair_for_on_chain(&factory, input, output).ok_or(RouterError::PairNotFound)?,
                 amount_0_out,
                 amount_1_out,
                 to,
