@@ -20,11 +20,10 @@ pub mod router {
 
     impl RouterContract {
         #[ink(constructor)]
-        pub fn new(factory: AccountId, wnative: AccountId, pair_code_hash: Hash) -> Self {
+        pub fn new(factory: AccountId, wnative: AccountId) -> Self {
             let mut instance = Self::default();
             instance.router.factory = factory;
             instance.router.wnative = wnative;
-            instance.router.pair_code_hash = pair_code_hash;
             instance
         }
     }
@@ -37,8 +36,7 @@ pub mod router {
         fn initialize_works() {
             let factory = AccountId::from([0x03; 32]);
             let wnative = AccountId::from([0x04; 32]);
-            let pair_code_hash = Hash::default();
-            let router = RouterContract::new(factory, wnative, pair_code_hash);
+            let router = RouterContract::new(factory, wnative);
             assert_eq!(router.factory(), factory);
             assert_eq!(router.wnative(), wnative);
         }

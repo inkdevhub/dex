@@ -48,7 +48,7 @@ describe('Dex spec', () => {
     pairHash = pair.abi.info.source.wasmHash.toHex();
     factoryFactory = new Factory_factory(api, deployer);
     factory = new Factory(
-      (await factoryFactory.new(wallet.address, pairHash)).address,
+      (await factoryFactory.new(wallet.address)).address,
       deployer,
       api,
     );
@@ -87,9 +87,7 @@ describe('Dex spec', () => {
     wnative = new Wnative((await wnativeFactory.new()).address, deployer, api);
     routerFactory = new Router_factory(api, deployer);
     router = new Router(
-      (
-        await routerFactory.new(factory.address, wnative.address, pairHash)
-      ).address,
+      (await routerFactory.new(factory.address, wnative.address)).address,
       deployer,
       api,
     );
@@ -135,7 +133,7 @@ describe('Dex spec', () => {
 
   it('create pair', async () => {
     expect((await factory.query.allPairsLength()).value.ok).toBe(0);
-    let {
+    const {
       gasRequired,
       value: {
         ok: { ok: expectedAddress },

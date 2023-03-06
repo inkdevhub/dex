@@ -1,14 +1,11 @@
 use crate::{
     helpers::math::casted_mul,
-    traits::pair::PairRef,
-};
-use ink::{
-    env::hash::{
-        Blake2x256,
-        HashOutput,
+    traits::{
+        factory::FactoryRef,
+        pair::PairRef,
     },
-    prelude::vec::Vec,
 };
+use ink::prelude::vec::Vec;
 use openbrush::traits::{
     AccountId,
     AccountIdExt,
@@ -44,42 +41,24 @@ pub fn sort_tokens(
     Ok((token_0, token_1))
 }
 
-/// Original Uniswap Library pairFor function calculate pair contract address without making cross contract calls.
-/// Please refer https://github.com/Uniswap/v2-periphery/blob/master/contracts/libraries/UniswapV2Library.sol#L18
-///
-/// In this contract, use precomputed address like Uniswap's, as ink!'s deployment is done via create2-like one by default.
-/// Please refer https://github.com/paritytech/substrate/blob/493b58bd4a475080d428ce47193ee9ea9757a808/frame/contracts/src/lib.rs#L178
-/// for how contract's address is calculated.
-pub fn pair_for(
-    factory: &[u8; 32],
-    pair_code_hash: &[u8],
+#[inline]
+pub fn pair_for_on_chain(
+    factory: &AccountId,
     token_a: AccountId,
     token_b: AccountId,
-) -> Result<AccountId, HelperError> {
-    let tokens = sort_tokens(token_a, token_b)?;
-    let mut output = <Blake2x256 as HashOutput>::Type::default();
-    ink::env::hash_encoded::<Blake2x256, _>(&tokens, &mut output);
-    let salt = &output[..4];
-    let input: Vec<_> = factory
-        .iter()
-        .chain(pair_code_hash)
-        .chain(salt)
-        .cloned()
-        .collect();
-    ink::env::hash_bytes::<Blake2x256>(&input, &mut output);
-    Ok(output.into())
+) -> Option<AccountId> {
+    FactoryRef::get_pair(factory, token_a, token_b)
 }
 
 pub fn get_reserves(
-    factory: &[u8; 32],
-    pair_code_hash: &[u8],
+    factory: &AccountId,
     token_a: AccountId,
     token_b: AccountId,
 ) -> Result<(Balance, Balance), HelperError> {
     let (token_0, _) = sort_tokens(token_a, token_b)?;
-    let pair_contract = pair_for(factory, pair_code_hash, token_a, token_b)?;
+    let pair_contract =
+        pair_for_on_chain(factory, token_a, token_b).ok_or(HelperError::PairNotFound)?;
     let (reserve_0, reserve_1, _) = PairRef::get_reserves(&pair_contract);
-
     if token_a == token_0 {
         Ok((reserve_0, reserve_1))
     } else {
@@ -171,8 +150,7 @@ pub fn get_amount_in(
 }
 
 pub fn get_amounts_out(
-    factory: &[u8; 32],
-    pair_code_hash: &[u8],
+    factory: &AccountId,
     amount_in: Balance,
     path: &Vec<AccountId>,
 ) -> Result<Vec<Balance>, HelperError> {
@@ -181,8 +159,7 @@ pub fn get_amounts_out(
     let mut amounts = Vec::with_capacity(path.len());
     amounts.push(amount_in);
     for i in 0..path.len() - 1 {
-        let (reserve_in, reserve_out) =
-            get_reserves(factory, pair_code_hash, path[i], path[i + 1])?;
+        let (reserve_in, reserve_out) = get_reserves(factory, path[i], path[i + 1])?;
         amounts.push(get_amount_out(amounts[i], reserve_in, reserve_out)?);
     }
 
@@ -190,8 +167,7 @@ pub fn get_amounts_out(
 }
 
 pub fn get_amounts_in(
-    factory: &[u8; 32],
-    pair_code_hash: &[u8],
+    factory: &AccountId,
     amount_out: Balance,
     path: &Vec<AccountId>,
 ) -> Result<Vec<Balance>, HelperError> {
@@ -203,8 +179,7 @@ pub fn get_amounts_in(
     }
     amounts[path.len() - 1] = amount_out;
     for i in (0..path.len() - 1).rev() {
-        let (reserve_in, reserve_out) =
-            get_reserves(factory, pair_code_hash, path[i], path[i + 1])?;
+        let (reserve_in, reserve_out) = get_reserves(factory, path[i], path[i + 1])?;
         amounts[i] = get_amount_in(amounts[i + 1], reserve_in, reserve_out)?;
     }
 
@@ -226,4 +201,5 @@ pub enum HelperError {
     CastOverflow2,
     InvalidPath,
     SubUnderFlow,
+    PairNotFound,
 }

@@ -43,7 +43,8 @@ pub mod factory {
                 .endowment(0)
                 .code_hash(pair_hash)
                 .salt_bytes(&salt_bytes[..4])
-                .try_instantiate() {
+                .try_instantiate()
+            {
                 Ok(Ok(res)) => Ok(res),
                 _ => Err(FactoryError::PairInstantiationFailed),
             }?;
@@ -80,8 +81,10 @@ pub mod factory {
     }
     #[cfg(test)]
     mod tests {
-        use ink::env::test::default_accounts;
-        use ink::primitives::Hash;
+        use ink::{
+            env::test::default_accounts,
+            primitives::Hash,
+        };
         use openbrush::traits::AccountIdExt;
 
         use super::*;

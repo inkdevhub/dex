@@ -4,7 +4,10 @@ use ink::{
 };
 use openbrush::{
     storage::Mapping,
-    traits::{AccountId, ZERO_ADDRESS}
+    traits::{
+        AccountId,
+        ZERO_ADDRESS,
+    },
 };
 
 pub const STORAGE_KEY: u32 = openbrush::storage_unique_key!(Data);
@@ -18,7 +21,6 @@ pub struct Data {
     pub all_pairs: Vec<AccountId>,
     pub pair_contract_code_hash: Hash,
 }
-
 
 impl Default for Data {
     fn default() -> Self {

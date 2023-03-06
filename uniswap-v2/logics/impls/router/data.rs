@@ -1,5 +1,7 @@
-use ink::primitives::Hash;
-use openbrush::traits::{AccountId, ZERO_ADDRESS};
+use openbrush::traits::{
+    AccountId,
+    ZERO_ADDRESS,
+};
 
 pub const STORAGE_KEY: u32 = openbrush::storage_unique_key!(Data);
 
@@ -8,7 +10,6 @@ pub const STORAGE_KEY: u32 = openbrush::storage_unique_key!(Data);
 pub struct Data {
     pub factory: AccountId,
     pub wnative: AccountId,
-    pub pair_code_hash: Hash,
 }
 
 impl Default for Data {
@@ -16,7 +17,6 @@ impl Default for Data {
         Self {
             factory: ZERO_ADDRESS.into(),
             wnative: ZERO_ADDRESS.into(),
-            pair_code_hash: Default::default(),
         }
     }
 }
