@@ -12,8 +12,8 @@ This is an unaudited full dex implementation ready to be used.
 - :white_large_square: Audit
 
 ### Versions
-[ink! 4.0 RC](https://github.com/paritytech/ink/tree/v4.0.0-rc)   
-[openbrush 3.0.0 beta.1](https://github.com/727-Ventures/openbrush-contracts/tree/3.0.0-beta.1)
+[ink! 4.0.0](https://github.com/paritytech/ink/tree/v4.0.0)   
+[openbrush 3.0.0](https://github.com/727-Ventures/openbrush-contracts/tree/3.0.0)
 
 ### License
 Apache 2.0
