@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
+import type { Hash } from '@polkadot/types/interfaces/runtime';
 import { Abi } from '@polkadot/api-contract';
 import Token_factory from '../types/constructors/psp22_token';
 import Factory_factory from '../types/constructors/factory_contract';
@@ -68,9 +69,20 @@ async function main(): Promise<void> {
     fs.readFileSync(__dirname + `/../artifacts/pair_contract.contract`, 'utf8'),
   );
   const pairAbi = new Abi(pairContractRaw);
-  const deployedHash = await api.tx.contracts
-    .uploadCode(pairAbi.info.source.wasm, null, 'Deterministic')
-    .signAndSend(deployer);
+  const deployedHash: Hash = await (new Promise(async (resolve, reject) => {
+    const unsub = await api.tx.contracts
+      .uploadCode(pairAbi.info.source.wasm, null, 'Deterministic')
+      .signAndSend(deployer, (result) => {
+        if (result.isFinalized) {
+          unsub();
+          resolve(result.txHash)
+        }
+        if (result.isError) {
+          unsub();
+          reject(result)
+        }
+      });
+  }))
   console.log('pair deployed with', deployedHash.toHuman());
   const pairHash = pairAbi.info.source.wasmHash.toHex();
 
