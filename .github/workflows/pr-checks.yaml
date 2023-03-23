@@ -2,8 +2,11 @@ name: PR checks
 on:
   push:
   workflow_dispatch:
+env:
+  NODE_JS_VER: 18.x
+  SWANKY_NODE_VER: v1.2.0
 jobs:
-  checks-and-tests:
+  tests:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the source code
@@ -25,6 +28,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-rust
 
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_JS_VER }}
+
     - name: Check if cargo-contract exists
       id: check-cargo-contract
       continue-on-error: true
@@ -36,14 +44,19 @@ jobs:
         cargo install cargo-dylint dylint-link
         cargo install --force --locked cargo-contract
 
-    - name: Compile checks
+    - name: Compile contracts
       run: |
-        manifest_paths=`find uniswap-v2/contracts -type f -name Cargo.toml`
-        echo $manifest_paths
-        for manifest_path in $manifest_paths; do
-          echo $manifest_path
-          cargo contract check --manifest-path $manifest_path
-        done
+        yarn
+        yarn compile
 
-    - name: test
+    - name: integration test
       run: cargo test
+
+    - name: e2e test
+      run: |
+        sudo wget https://github.com/AstarNetwork/swanky-node/releases/download/${{ env.SWANKY_NODE_VER }}/swanky-node-${{ env.SWANKY_NODE_VER }}-ubuntu-x86_64.tar.gz
+        sudo tar -zxvf swanky-node-v1.2.0-ubuntu-x86_64.tar.gz
+        sudo chmod +x swanky-node
+        ./swanky-node -lerror,runtime::contracts=debug &
+        sleep 10
+        yarn test:typechain
