@@ -3,6 +3,7 @@ on:
   push:
   workflow_dispatch:
 env:
+  NODE_JS_VER: 18.x
   SWANKY_NODE_VER: v1.2.0
 jobs:
   checks-and-tests:
@@ -27,6 +28,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-rust
 
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_JS_VER }}
+
     - name: Check if cargo-contract exists
       id: check-cargo-contract
       continue-on-error: true
@@ -41,7 +47,9 @@ jobs:
         cargo install --force --locked cargo-contract --version 2.0.0
 
     - name: Compile contracts
-      run: yarn compile
+      run: |
+        yarn
+        yarn compile
 
     - name: integration test
       run: cargo test
