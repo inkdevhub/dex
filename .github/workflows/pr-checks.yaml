@@ -2,6 +2,8 @@ name: PR checks
 on:
   push:
   workflow_dispatch:
+env:
+  SWANKY_NODE_VER: v1.2.0
 jobs:
   checks-and-tests:
     runs-on: ubuntu-latest
@@ -38,14 +40,17 @@ jobs:
         # Until 2.0.0 official release, we need to specify --version expressly
         cargo install --force --locked cargo-contract --version 2.0.0
 
-    - name: Compile checks
-      run: |
-        manifest_paths=`find uniswap-v2/contracts -type f -name Cargo.toml`
-        echo $manifest_paths
-        for manifest_path in $manifest_paths; do
-          echo $manifest_path
-          cargo contract check --manifest-path $manifest_path
-        done
+    - name: Compile contracts
+      run: yarn compile
 
-    - name: test
+    - name: integration test
       run: cargo test
+
+    - name: e2e test
+      run: |
+        sudo wget https://github.com/AstarNetwork/swanky-node/releases/download/${{ env.SWANKY_NODE_VER }}/swanky-node-${{ env.SWANKY_NODE_VER }}-ubuntu-x86_64.tar.gz
+        sudo tar -zxvf swanky-node-v1.2.0-ubuntu-x86_64.tar.gz
+        sudo chmod +x swanky-node
+        ./swanky-node -lerror,runtime::contracts=debug &
+        sleep 10
+        yarn test:typechain

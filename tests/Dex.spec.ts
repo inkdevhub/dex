@@ -48,7 +48,7 @@ describe('Dex spec', () => {
     pairHash = pair.abi.info.source.wasmHash.toHex();
     factoryFactory = new Factory_factory(api, deployer);
     factory = new Factory(
-      (await factoryFactory.new(wallet.address)).address,
+      (await factoryFactory.new(wallet.address, pairHash)).address,
       deployer,
       api,
     );
