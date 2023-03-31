@@ -159,6 +159,7 @@ describe('Dex spec', () => {
       token0.address,
       token1.address,
     );
+    console.log("pairAddress");
     pair = new Pair(pairAddress.value.ok as string, deployer, api);
     ({ gasRequired } = await token0.query.transfer(pair.address, liqudity, []));
     await token0.tx.transfer(pair.address, liqudity, [], {
